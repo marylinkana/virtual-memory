@@ -1,67 +1,116 @@
 package vm;
 
 import java.util.Arrays;
-import java.util.Random;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
 
 public class Memory {
-    private Space spaces[];
-    private Random r_adress = new Random();
+    //Contien l'ensemble des espaces mémoire
+    private Space[] spaces;
+    private int startAvailableIndex;
 
+    //initialise les espaces mémoire en fonction de la taille souhaitée
     public Memory(int _size) {
         spaces = new Space[_size];
         for (int i = 0; i < _size; i++){
-            spaces[i] = new Space(r_adress.nextInt());
+            spaces[i] = new Space();
+            //on initialise la valeur de allocAdr à -1 pour signifié qu'il n'est pas alloué
+            spaces[i].setAllocAdr(-1);
         }
+        startAvailableIndex = 0;
     }
 
+    // alloue le nombre d'espace mémoire demandée
     public int allocate(int size) {
-        int uaa = r_adress.nextInt();
-        if (size < freeSpaces().count()){
-            for (int i = 0; i < size; i++){
-                freeSpaces().forEach(space -> {space.setAdress(uaa);});
+        // vérifie qu'il a assez d'espace mémoire avant d'effectuer l'allocation
+        if (evalableSpace() >= size ){
+            final int allocAdress = startAvailableIndex;
+            spaces[allocAdress].setAllocAdr(allocAdress);
+            startAvailableIndex += size;
+            return allocAdress;
+        }
+        // s'il n'y a plus assez d'espaces mémoire on retourne -1
+        else {
+            System.out.println("!!!Espace insufisant!!!");
+        }
+        return -1;
+    }
+
+    private int evalableSpace(){
+        return spaces.length - startAvailableIndex;
+    }
+
+    public Space[] getSpaces() {
+        return spaces;
+    }
+
+    // Libère les espaces mémoire alloué à l'adresse défini
+    public void release(int adress, int size) {
+        try{
+            for(int i = adress; i < adress + size; i++){
+                spaces[i].setAllocAdr(-1);
+                spaces[i].setValue(null);
             }
         }
-        return uaa;
+        catch (Exception e){
+            System.out.println(e.getMessage());
+        }
     }
-
-    private Stream<Space> freeSpaces(){
-        return Arrays.stream(spaces).filter(space -> space.getAllocationAdress() != 0);
-    }
-
-    private Stream<Space> getSpace(int adress){
-        return Arrays.stream(spaces).filter(space -> space.getAllocationAdress() == adress);
-    }
-
-    public void release(int adress) {
-        Arrays.stream(spaces).forEach(space -> {
-            if (space.getAllocationAdress() == adress){
-                space.setAllocationAdress(0);
+    // Renvoie la valeur présente dans l'espace alloué
+    public void readValue(int adress) {
+        try{
+            if(spaces[adress].getAllocAdr() != -1){
+                System.out.println(spaces[adress].getValues());
             }
-        });
+            else System.out.println("Adresse non alloué");
+        }
+        catch (Exception e){
+            System.out.println(e.getMessage());
+        }
     }
 
-    public int getsize() {
-        return spaces.length;
-    }
-
-    public void readValue(int adress){
-        getSpace(adress).forEach(space -> {
-            System.out.println(space.getValues());
-        });
-    }
-
+    // Renvoie la valeur située à la position donnée dans l'espace alloué
     public void readValue(int adress, int position) {
-        System.out.println(getSpace(adress).collect(Collectors.toList()).get(position - 1).getValues());
+        try {
+            if(spaces[adress].getAllocAdr() != -1) {
+                System.out.println(spaces[adress + position].getValues());
+            }
+            else System.out.println("Adresse non alloué");
+        }
+        catch (Exception e){
+            System.out.println(e.getMessage());
+        }
     }
 
+    // Saisie une valeur à la première position dans l'espace alloué
     public void writeValue(int adress, String value){
-        getSpace(adress).collect(Collectors.toList()).get(0).setValue(value);
+        try {
+            if(spaces[adress].getAllocAdr() != -1) {
+                spaces[adress].setValue(value);
+            }
+            else System.out.println("Adresse non alloué");
+        }
+        catch (Exception e){
+            System.out.println(e.getMessage());
+        }
     }
 
-    public void writeValue(int adress, int position, String value){
-        getSpace(adress).collect(Collectors.toList()).get(position-1).setValue(value);
+    // Saisie une valeur à la position donnée dans l'espace alloué
+    public void writeValue(int adress, String value,  int position){
+        try {
+            if(spaces[adress].getAllocAdr() != -1) {
+                spaces[adress + position].setValue(value);
+            }
+            else System.out.println("Adresse non alloué");
+        }
+        catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+    }
 
+    @Override
+    public String toString() {
+        return "Memory{" +
+                "\nspaces=" + Arrays.toString(spaces) +
+                '}';
     }
 }

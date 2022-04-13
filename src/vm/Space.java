@@ -1,23 +1,10 @@
 package vm;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Space {
-    private int adress;
-    private int allocationAdress;
+    private int allocAdr;
     private String value;
 
-    public Space(int _adress) {
-        adress = _adress;
-    }
-
-    public int getAdress() {
-        return adress;
-    }
-
-    public void setAdress(int adress) {
-        this.adress = adress;
+    public Space() {
     }
 
     public String getValues() {
@@ -28,19 +15,19 @@ public class Space {
         value = _value;
     }
 
-    public int getAllocationAdress() {
-        return allocationAdress;
+    public int getAllocAdr() {
+        return allocAdr;
     }
 
-    public void setAllocationAdress(int allocationAdress) {
-        this.allocationAdress = allocationAdress;
+    public void setAllocAdr(int allocAdr) {
+        this.allocAdr = allocAdr;
     }
 
     @Override
     public String toString() {
         return "\nSpace{" +
-                "adress=" + adress +
-                ", value=" + value +
+                ", allocAdr=" + allocAdr +
+                ", value='" + value + '\'' +
                 '}';
     }
 }
