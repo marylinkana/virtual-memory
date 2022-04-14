@@ -2,10 +2,9 @@ package vm;
 
 import java.util.Arrays;
 
-
 public class Memory {
-    //Contien l'ensemble des espaces mémoire
-    private Space[] spaces;
+    //Contient l'ensemble des espaces mémoire
+    private Space[] spaces; // l'objet Space est constitué d'une valeur et d'une adresse d'allocation
     private int startAvailableIndex;
 
     //initialise les espaces mémoire en fonction de la taille souhaitée
@@ -13,18 +12,20 @@ public class Memory {
         spaces = new Space[_size];
         for (int i = 0; i < _size; i++){
             spaces[i] = new Space();
-            //on initialise la valeur de allocAdr à -1 pour signifié qu'il n'est pas alloué
+            //on initialise la valeur de allocAdr à -1 pour signifier qu'il n'est pas alloué
             spaces[i].setAllocAdr(-1);
         }
         startAvailableIndex = 0;
     }
 
-    // alloue le nombre d'espace mémoire demandée
+    // alloue le nombre d'espace mémoire demandé
     public int allocate(int size) {
-        // vérifie qu'il a assez d'espace mémoire avant d'effectuer l'allocation
+        // vérifie qu'il y a assez d'espace mémoire avant d'effectuer l'allocation
         if (evalableSpace() >= size ){
             final int allocAdress = startAvailableIndex;
-            spaces[allocAdress].setAllocAdr(allocAdress);
+            for(int i = allocAdress; i < allocAdress + size; i++){
+                spaces[i].setAllocAdr(allocAdress);
+            }
             startAvailableIndex += size;
             return allocAdress;
         }
@@ -35,20 +36,19 @@ public class Memory {
         return -1;
     }
 
+    //renvoie l'index du premier espace disponible
     private int evalableSpace(){
         return spaces.length - startAvailableIndex;
     }
 
-    public Space[] getSpaces() {
-        return spaces;
-    }
-
-    // Libère les espaces mémoire alloué à l'adresse défini
+    // Libère les espaces mémoire alloué à l'adresse définie
     public void release(int adress, int size) {
         try{
             for(int i = adress; i < adress + size; i++){
-                spaces[i].setAllocAdr(-1);
-                spaces[i].setValue(null);
+                if(spaces[i].getAllocAdr() == adress){
+                    spaces[i].setAllocAdr(-1);
+                    spaces[i].setValue(null);
+                }
             }
         }
         catch (Exception e){
@@ -58,10 +58,11 @@ public class Memory {
     // Renvoie la valeur présente dans l'espace alloué
     public void readValue(int adress) {
         try{
-            if(spaces[adress].getAllocAdr() != -1){
+            // vérifie que l'espace est bien alloué à cette adresse
+            if(spaces[adress].getAllocAdr() == adress){
                 System.out.println(spaces[adress].getValues());
             }
-            else System.out.println("Adresse non alloué");
+            else System.out.println("Bad Adress");
         }
         catch (Exception e){
             System.out.println(e.getMessage());
@@ -71,10 +72,11 @@ public class Memory {
     // Renvoie la valeur située à la position donnée dans l'espace alloué
     public void readValue(int adress, int position) {
         try {
-            if(spaces[adress].getAllocAdr() != -1) {
-                System.out.println(spaces[adress + position].getValues());
+            // vérifie que l'espace est bien alloué à cette adresse
+            if(spaces[adress + position -1].getAllocAdr() == adress) {
+                System.out.println(spaces[adress + position -1].getValues());
             }
-            else System.out.println("Adresse non alloué");
+            else System.out.println("Bad Adress");
         }
         catch (Exception e){
             System.out.println(e.getMessage());
@@ -84,10 +86,10 @@ public class Memory {
     // Saisie une valeur à la première position dans l'espace alloué
     public void writeValue(int adress, String value){
         try {
-            if(spaces[adress].getAllocAdr() != -1) {
+            if(spaces[adress].getAllocAdr() == adress) {
                 spaces[adress].setValue(value);
             }
-            else System.out.println("Adresse non alloué");
+            else System.out.println("Bad Adress");
         }
         catch (Exception e){
             System.out.println(e.getMessage());
@@ -97,10 +99,11 @@ public class Memory {
     // Saisie une valeur à la position donnée dans l'espace alloué
     public void writeValue(int adress, String value,  int position){
         try {
-            if(spaces[adress].getAllocAdr() != -1) {
-                spaces[adress + position].setValue(value);
+            // vérifie que l'espace est bien alloué à cette adresse
+            if(spaces[adress + position -1].getAllocAdr() == adress) {
+                spaces[adress + position -1].setValue(value);
             }
-            else System.out.println("Adresse non alloué");
+            else System.out.println("Bad Adress");
         }
         catch (Exception e){
             System.out.println(e.getMessage());
