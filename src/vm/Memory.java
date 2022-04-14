@@ -42,7 +42,7 @@ public class Memory {
     }
 
     // Libère les espaces mémoire alloué à l'adresse définie
-    public void release(int adress, int size) {
+    public void releaseSpace(int adress, int size) {
         try{
             for(int i = adress; i < adress + size; i++){
                 if(spaces[i].getAllocAdr() == adress){

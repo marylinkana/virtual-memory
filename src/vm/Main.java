@@ -20,7 +20,7 @@ public class Main {
         mem.writeValue(adr1, "bad", 3); // return error's message because adr1 don't have 3 spaces
         mem.writeValue(adr2, "good", 3); // write good at the 3th position of adr2
 
-        mem.release(adr1, 2); // release the 2 spaces of adr1
+        mem.releaseSpace(adr1, 2); // release the 2 spaces of adr1
         mem.readValue(adr1); // return error's message because adr1 is no longer allocate
 
         int adr5 = mem.allocate(2);
@@ -29,6 +29,5 @@ public class Main {
         // start avalable index is at 10 and the last index of the mémory is 9
 
         System.out.println(mem.toString());
-
     }
 }
